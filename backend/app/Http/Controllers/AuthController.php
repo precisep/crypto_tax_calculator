@@ -112,7 +112,7 @@ class AuthController extends Controller
             'user_id' => $request->user()->id,
             'name' => $request->name ?? 'Calculation ' . date('Y-m-d H:i:s'),
             'transactions' => $request->transactions,
-            'results' => null, // You can calculate and save results here if needed
+            'results' => null, // You can compute and store results here if needed
         ]);
 
         return response()->json([
@@ -160,30 +160,43 @@ class AuthController extends Controller
     }
 
     public function handleGoogleCallback()
-    {
-        try {
-            $googleUser = Socialite::driver('google')->user();
-            
-            $user = User::where('email', $googleUser->email)->first();
-            
-            if (!$user) {
-                $user = User::create([
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email,
-                    'password' => Hash::make(Str::random(24)),
-                    'google_id' => $googleUser->id,
-                ]);
-            } else {
-                $user->update(['google_id' => $googleUser->id]);
-            }
-            
-            $token = $user->createToken('auth_token')->plainTextToken;
-            
-            // Redirect back to frontend with token
-            return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '?token=' . $token . '&user=' . urlencode(json_encode($user)));
-            
-        } catch (\Exception $e) {
-            return redirect(env('FRONTEND_URL', 'http://localhost:3000') . '?error=' . urlencode($e->getMessage()));
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
+        
+        $user = User::where('email', $googleUser->email)->first();
+        
+        if (!$user) {
+            $user = User::create([
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'password' => Hash::make(Str::random(24)),
+                'google_id' => $googleUser->id,
+            ]);
+        } else {
+            $user->update(['google_id' => $googleUser->id]);
         }
+        
+        $token = $user->createToken('auth_token')->plainTextToken;
+        
+        // Use the correct frontend URL (5173 instead of 3000)
+        $frontendUrl = 'http://localhost:5173';
+        
+        // Encode user data to pass to frontend
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'google_id' => $user->google_id,
+        ];
+        
+        $redirectUrl = $frontendUrl . '/oauth-callback?token=' . $token . '&user=' . urlencode(json_encode($userData));
+        
+        return redirect($redirectUrl);
+        
+    } catch (\Exception $e) {
+        \Log::error('Google OAuth error: ' . $e->getMessage());
+        return redirect('http://localhost:5173' . '?error=' . urlencode('Google login failed'));
     }
+}
 }
