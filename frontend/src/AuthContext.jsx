@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -11,143 +11,62 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // Initialize from localStorage on app start
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  const [isProcessingOAuth, setIsProcessingOAuth] = useState(false);
 
-  // Check authentication status
-  const checkAuth = useCallback(async (authToken = null) => {
-    const storedToken = authToken || localStorage.getItem('token');
-    if (!storedToken) {
-      setLoading(false);
-      return false;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8000/api/user', {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setUser(data.user);
-          setToken(storedToken);
-          localStorage.setItem('token', storedToken);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          setLoading(false);
-          return true;
+  useEffect(() => {
+    // Check if user is logged in on mount
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        try {
+          const response = await fetch('http://localhost:8000/api/user', {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+            },
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              setUser(data.user);
+              setToken(storedToken);
+            } else {
+              logout();
+            }
+          } else {
+            logout();
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          logout();
         }
       }
-      // If auth fails, clear everything
-      logout();
-      return false;
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      logout();
-      return false;
-    }
+      setLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
-  // Initial auth check on mount
+  // Check for Google OAuth callback
   useEffect(() => {
-    const initAuth = async () => {
-      // Check for OAuth callback parameters first
-      const urlParams = new URLSearchParams(window.location.search);
-      const tokenParam = urlParams.get('token');
-      const userParam = urlParams.get('user');
-      
-      if (tokenParam) {
-        // This is an OAuth callback
-        await handleOAuthCallback(tokenParam, userParam);
-      } else {
-        // Normal initialization - check existing auth
-        await checkAuth();
-      }
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const userParam = urlParams.get('user');
     
-    initAuth();
-  }, [checkAuth]);
-
-  // Handle OAuth callback
-  const handleOAuthCallback = async (tokenParam, userParam) => {
-    setIsProcessingOAuth(true);
-    try {
-      // Decode and parse user data if available
-      let userData = null;
-      if (userParam) {
-        try {
-          userData = JSON.parse(decodeURIComponent(userParam));
-        } catch (e) {
-          console.error('Failed to parse user data:', e);
-        }
-      }
-      
-      // Store token and user data
-      localStorage.setItem('token', tokenParam);
-      setToken(tokenParam);
-      
-      if (userData) {
-        // Use user data from OAuth response
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-      } else {
-        // Fetch user data from API
-        await checkAuth(tokenParam);
-      }
-      
-      // Clear URL parameters WITHOUT reloading
-      if (window.history.replaceState) {
-        const cleanUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-      }
-      
-      // Notify that we're logged in
-      window.dispatchEvent(new Event('auth-change'));
-      
-    } catch (e) {
-      console.error('Error processing OAuth callback:', e);
-    } finally {
-      setIsProcessingOAuth(false);
-      setLoading(false);
-    }
-  };
-
-  // Sync token changes with localStorage
-  useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
+      try {
+        const user = userParam ? JSON.parse(decodeURIComponent(userParam)) : null;
+        localStorage.setItem('token', token);
+        setToken(token);
+        setUser(user);
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
     }
-  }, [token]);
-
-  // Sync user changes with localStorage
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
-
-  // Listen for auth changes (for OAuth callback)
-  useEffect(() => {
-    const handleAuthChange = () => {
-      // Force a re-render when auth changes
-      setUser(JSON.parse(localStorage.getItem('user') || 'null'));
-      setToken(localStorage.getItem('token'));
-    };
-
-    window.addEventListener('auth-change', handleAuthChange);
-    return () => window.removeEventListener('auth-change', handleAuthChange);
   }, []);
 
   const login = async (email, password) => {
@@ -164,7 +83,6 @@ export const AuthProvider = ({ children }) => {
       
       if (data.success) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
         return { success: true };
@@ -190,7 +108,6 @@ export const AuthProvider = ({ children }) => {
       
       if (data.success) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
         return { success: true };
@@ -203,15 +120,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const googleLogin = () => {
-    // Store the current path to potentially return to it
-    const returnPath = window.location.pathname + window.location.search;
-    localStorage.setItem('returnPath', returnPath);
-    
-    // Redirect to Google OAuth
     window.location.href = 'http://localhost:8000/api/auth/google';
   };
 
-  const logout = useCallback(async () => {
+  const logout = async () => {
     if (token) {
       try {
         await fetch('http://localhost:8000/api/logout', {
@@ -226,16 +138,10 @@ export const AuthProvider = ({ children }) => {
       }
     }
     
-    // Clear all auth state
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('returnPath');
     setToken(null);
     setUser(null);
-    
-    // Dispatch auth change event
-    window.dispatchEvent(new Event('auth-change'));
-  }, [token]);
+  };
 
   const saveTransactions = async (transactions, name) => {
     try {
@@ -288,8 +194,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     token,
-    loading: loading || isProcessingOAuth,
-    isProcessingOAuth,
+    loading,
     login,
     register,
     googleLogin,
@@ -297,7 +202,6 @@ export const AuthProvider = ({ children }) => {
     saveTransactions,
     getCalculations,
     loadCalculation,
-    refreshAuth: () => checkAuth(token),
   };
 
   return (
