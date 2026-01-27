@@ -4,7 +4,7 @@ import {
   BarChart3, Wallet
 } from 'lucide-react';
 import './App.css';
-
+import Logo from './components/Logo';
 // Components
 import InputTab from './components/tabs/InputTab';
 import ResultsTab from './components/tabs/ResultsTab';
@@ -208,8 +208,7 @@ function App() {
         <div className="header-content">
           <div className="logo">
             <div className="logo-icon">
-              <Calculator size={36} />
-              <div className="taxtim-badge">TaxTim</div>
+              <Logo width={75} height={75} />
             </div>
             <div>
               <h1>Crypto Tax Calculator</h1>
@@ -333,8 +332,7 @@ function App() {
           <div className="footer-right">
             <div className="footer-partner">
               <div className="partner-badge">
-                <strong>TAXTIM</strong>
-                <span>Official Partner</span>
+                <Logo width={210} height={60} />
               </div>
               <p>Developed for South African taxpayers</p>
             </div>
