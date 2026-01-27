@@ -11,7 +11,7 @@ class CryptoCalculatorService
     private $results = [];
     private $baseCostSnapshots = [];
     private $yearlyCapitalGains = [];
-    private $fees = 0.0025; // 0.25% exchange fee
+    private $fees = 0.0025; 
 
     public function __construct(array $transactions)
     {
