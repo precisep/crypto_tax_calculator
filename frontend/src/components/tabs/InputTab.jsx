@@ -31,19 +31,47 @@ const InputTab = ({
     <div className="tab-content">
       <div className="card">
         <div className="card-header">
-          <div className="header-with-help">
-            <h2>Upload Your Crypto Transactions</h2>
-            <button 
-              className="btn-icon help" 
-              onClick={() => setShowHelp(!showHelp)}
-              title="Show help"
-            >
-              <HelpCircle size={20} />
-            </button>
+          <div className="card-content">
+            <div className="card-header-content">
+              <div className="header-with-help">
+                <h2>Upload Your Crypto Transactions</h2>
+                <button 
+                  className="btn-icon help" 
+                  onClick={() => setShowHelp(!showHelp)}
+                  title="Show help"
+                >
+                  <HelpCircle size={20} />
+                </button>
+              </div>
+              <p className="card-subtitle">
+                Upload your crypto transaction data to calculate SARS-compliant tax liability
+              </p>
+              {error && (
+                <div className="error-message">
+                  <strong>Error:</strong> {error}
+                </div>
+              )}
+            </div>
+            <div className="calculator">
+              <button 
+               className="calculator-btn btn-primary btn-lg"
+               onClick={handleCalculate}
+               disabled={loading}
+              >
+                {loading ? (
+                    <>
+                      <div className="spinner"></div>
+                      Calculating...
+                    </>
+                  ) : (
+                    <>
+                      <Calculator size={15} />
+                      Calculate
+                    </>
+                  )}
+              </button>
+            </div>
           </div>
-          <p className="card-subtitle">
-            Upload your crypto transaction data to calculate SARS-compliant tax liability
-          </p>
         </div>
         
         {showHelp && (
@@ -131,6 +159,7 @@ const InputTab = ({
           <div className="upload-info">
             <p><strong>Required Columns:</strong> date, coin, type (buy/sell/trade/transfer), amount, price (ZAR), wallet</p>
             <p><strong>Download</strong> your transaction history from your exchange and upload it here</p>
+            <p><strong>Click</strong> calculate to process {transactions.length} transactions using SARS FIFO method</p>
           </div>
         </div>
 
@@ -272,42 +301,9 @@ const InputTab = ({
                   </tbody>
                 </table>
               </div>
-
-              <div className="calculate-section">
-                <div className="calculate-info">
-                  <Calculator size={20} />
-                  <div>
-                    <h4>Ready to Calculate</h4>
-                    <p>Click below to process {transactions.length} transactions using SARS FIFO method</p>
-                  </div>
-                </div>
-                <button 
-                  className="btn btn-primary btn-lg" 
-                  onClick={handleCalculate}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <div className="spinner"></div>
-                      Calculating...
-                    </>
-                  ) : (
-                    <>
-                      <Calculator size={20} />
-                      Calculate SARS Tax Liability
-                    </>
-                  )}
-                </button>
-              </div>
             </>
           )}
         </div>
-
-        {error && (
-          <div className="error-message">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
       </div>
     </div>
   );
