@@ -1,0 +1,12 @@
+{
+  "name": "Laravel + React (PHP 8.2, Node 20)",
+  "image": "mcr.microsoft.com/devcontainers/php:8.2",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+  "postCreateCommand": "cd backend && composer install && cp -n .env.example .env && php artisan key:generate || true",
+  "remoteUser": "vscode"
+}
+
