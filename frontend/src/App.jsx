@@ -10,6 +10,7 @@ import InputTab from './components/tabs/InputTab';
 import ResultsTab from './components/tabs/ResultsTab';
 import BalancesTab from './components/tabs/BalancesTab';
 import TaxTab from './components/tabs/TaxTab';
+import Navbar from './components/Navbar'
 
 // Hooks
 import { useCalculate } from './hooks';
@@ -204,41 +205,7 @@ function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="header-content">
-          <div className="logo">
-            <div className="logo-icon">
-              <Logo width={75} height={75} />
-            </div>
-            <div>
-              <h1>Crypto Tax Calculator</h1>
-              <p className="subtitle">SARS FIFO Calculations for South African Taxpayers</p>
-            </div>
-          </div>
-          <div className="header-actions">
-            <button className="btn btn-secondary btn-sm" onClick={loadExample}>
-              <FileSpreadsheet size={16} />
-              Load Example
-            </button>
-            <button 
-              className="btn btn-primary btn-sm" 
-              onClick={() => exportToCSV(results)}
-              disabled={!results}
-            >
-              <Download size={16} />
-              Export Report
-            </button>
-          </div>
-        </div>
-        <div className="header-banner">
-          <div className="banner-content">
-            <strong>SARS Compliant</strong> • 
-            <strong>FIFO Method</strong> • 
-            <strong>R40,000 Annual Exclusion</strong> • 
-            <strong>Official TaxTim Partner</strong>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="main">
         <div className="tabs">
@@ -313,38 +280,6 @@ function App() {
         )}
       </main>
 
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-left">
-            <div className="footer-logo">
-              <Calculator size={24} />
-              <div>
-                <p className="footer-title">TaxTim Crypto Tax Calculator</p>
-                <p className="footer-tagline">Official SARS FIFO Calculations</p>
-              </div>
-            </div>
-            <p className="footer-disclaimer">
-              This tool provides estimates for informational purposes only. 
-              Consult a tax professional for official tax advice. Calculations use 
-              SARS-required FIFO method with R40,000 annual exclusion.
-            </p>
-          </div>
-          <div className="footer-right">
-            <div className="footer-partner">
-              <div className="partner-badge">
-                <Logo width={210} height={60} />
-              </div>
-              <p>Developed for South African taxpayers</p>
-            </div>
-            <p className="footer-copyright">
-              © 2024 TaxTim Crypto Tax Calculator. All rights reserved.
-            </p>
-            <p className="footer-version">
-              Version 1.0 • SARS Compliant • FIFO Method
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
