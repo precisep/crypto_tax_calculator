@@ -4,7 +4,7 @@ import {
   BarChart3, Wallet
 } from 'lucide-react';
 import './App.css';
-
+import Logo from './components/Logo';
 // Components
 import InputTab from './components/tabs/InputTab';
 import ResultsTab from './components/tabs/ResultsTab';
