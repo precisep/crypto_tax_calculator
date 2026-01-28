@@ -1,13 +1,14 @@
 /* App.css - Cleaned Version without Duplicates */
 :root {
-  /* Color Palette */
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
-  --primary-900: #1e3a8a;
-  
+  --primary-50:  #e6f7f9;  
+  --primary-100: #cceff3; 
+  --primary-300: #80d9e3;  
+  --primary-500: #a0dfe7;  
+  --primary-600: #7ac9d3;  
+  --primary-700: #52b3be;  
+  --primary-900: #064e3b;  
+
+  /* Gray Palette (unchanged) */
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
@@ -18,10 +19,8 @@
   --gray-700: #374151;
   --gray-800: #1f2937;
   --gray-900: #111827;
-  
-  --green-50: #f0fdf4;
-  --green-500: #10b981;
-  --green-600: #059669;
+
+  /* Other Colors (red, yellow, blue, purple) as needed */
   --red-50: #fef2f2;
   --red-500: #ef4444;
   --red-600: #dc2626;
@@ -34,7 +33,7 @@
   --blue-50: #eff6ff;
   --blue-500: #3b82f6;
   --blue-600: #2563eb;
-  
+
   /* Theme Variables */
   --bg-primary: white;
   --bg-secondary: var(--gray-50);
@@ -63,11 +62,12 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  line-height: 1.5;
-  color: var(--text-primary);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    var(--primary-50) 0%,
+    #ffffff 60%
+  );
+  color: var(--gray-700);
 }
 
 /* App Container */
@@ -82,7 +82,7 @@ body {
 /* Header Styles */
 .header {
   background: var(--bg-header);
-  color: var(--text-inverse);
+  color: var(--gray-700);
   padding: 1.25rem 2rem;
   position: relative;
   overflow: hidden;
@@ -110,12 +110,10 @@ body {
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
 }
 
 .logo-icon {
   position: relative;
-  margin-right: 0.75rem;
 }
 
 .taxtim-badge {
@@ -123,7 +121,7 @@ body {
   top: -8px;
   right: -8px;
   background: var(--primary-600);
-  color: white;
+  color: var(--gray-700);
   font-size: 0.625rem;
   font-weight: 700;
   padding: 0.125rem 0.375rem;
